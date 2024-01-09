@@ -109,11 +109,11 @@
 						frontId = this.contentObj[key]
 					}
 				}
-				console.log(afterId,nowId,frontId);
+				console.log(afterId, nowId, frontId);
 				let isFront = false
 				let isNow = false
 				let isAfter = false
-				if(this.activeContentList && this.activeContentList.length > 0) {
+				if (this.activeContentList && this.activeContentList.length > 0) {
 					this.activeContentList.forEach(item => {
 						if (frontId === item.id) {
 							isFront = true

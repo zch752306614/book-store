@@ -1,9 +1,9 @@
 import Vue from 'vue'
 // #ifdef H5
-let baseUrl = "/dev-api"
+let baseUrl = "/novel"
 // #endif
 // #ifndef H5
-let baseUrl = "http://121.4.69.234:8001"
+let baseUrl = "http://121.4.69.234:8000/novel"
 // #endif
 let timeout = 0
 let requestTimes = 0

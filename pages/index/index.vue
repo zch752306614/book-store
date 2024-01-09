@@ -21,7 +21,8 @@
 			<view class="bookshelf-list">
 				<view v-for="(item, index) in list" :key="index" class="list-one" @click="toBookread(item)">
 					<view class="list-one-top">
-						<image class="one-book" :src="item.novelCover?item.novelCover:'../../static/images/frxxz-cover.jpg'"></image>
+						<image class="one-book"
+							:src="item.novelCover?item.novelCover:'../../static/images/frxxz-cover.jpg'"></image>
 						<view class="book-light"></view>
 					</view>
 					<span class="book-name">{{item.novelName}}</span>
@@ -42,7 +43,9 @@
 						<view class="read-one-introduce">修仙觅长生，热血任逍遥，踏莲曳波涤剑骨，凭虚御风塑圣魂！修仙觅长生，热血任逍遥，踏莲曳波涤剑骨，凭虚御风塑圣魂！</view>
 						<view class="read-one-main">
 							<view class="read-one-left">
-								<image class="one-book" :src="item.novelCover?item.novelCover:'../../static/images/frxxz-cover.jpg'"></image>
+								<image class="one-book"
+									:src="item.novelCover?item.novelCover:'../../static/images/frxxz-cover.jpg'">
+								</image>
 								<view class="book-light"></view>
 							</view>
 							<view class="read-one-right">
@@ -77,7 +80,7 @@
 		methods: {
 			getBookList() {
 				this.$Api.default.getBookList(this.pageObj, false, false).then(res => {
-					 this.list = res.data.rows || []
+					this.list = res.data.rows || []
 				})
 			},
 			toBookread(item) {
@@ -173,7 +176,7 @@
 				font-size: 28rpx;
 			}
 		}
-		
+
 		.book-light {
 			width: 100%;
 			height: 100%;
@@ -230,8 +233,8 @@
 			width: 100%;
 			padding: 30rpx 20rpx;
 			box-sizing: border-box;
-			
-			.read-top{
+
+			.read-top {
 				padding-top: 30rpx;
 				box-sizing: border-box;
 			}
@@ -241,18 +244,18 @@
 				padding: 0rpx 30rpx;
 				box-sizing: border-box;
 				display: flex;
-				flex-direction: column; 
+				flex-direction: column;
 				background-color: #f4f4f4;
 				border-radius: 30rpx;
-				
-				.read-list{
+
+				.read-list {
 					width: calc(100% + 30rpx);
 					padding: 30rpx 0rpx;
 					box-sizing: border-box;
 					display: flex;
 					align-items: center;
-					
-					.list-one{
+
+					.list-one {
 						width: 350rpx;
 						height: 400rpx;
 						padding: 20rpx;
@@ -265,8 +268,8 @@
 						overflow: hidden;
 						position: relative;
 						margin-right: 30rpx;
-						
-						.read-one-introduce{
+
+						.read-one-introduce {
 							width: 100%;
 							height: 200rpx;
 							color: #333;
@@ -274,8 +277,8 @@
 							font-size: 30rpx;
 							line-height: 50rpx;
 						}
-						
-						.read-one-main{
+
+						.read-one-main {
 							width: 100%;
 							display: flex;
 							align-items: center;
@@ -284,12 +287,12 @@
 							bottom: 20rpx;
 							background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 1) 20%);
 							padding-top: 18rpx;
-							
-							.read-one-left{
+
+							.read-one-left {
 								width: 100rpx;
 								height: 140rpx;
 								position: relative;
-								
+
 								.one-book {
 									width: 100%;
 									height: 100%;
@@ -297,24 +300,27 @@
 									border: #bebebe 1rpx solid;
 								}
 							}
-							
-							.read-one-right{
+
+							.read-one-right {
 								flex: 1;
 								display: flex;
 								flex-direction: column;
 								margin-left: 20rpx;
-								.right-line{
+
+								.right-line {
 									width: 100%;
 									height: 1rpx;
 									background-color: #cecece;
 								}
-								.book-name{
+
+								.book-name {
 									color: #333;
 									font-weight: 500;
 									font-size: 30rpx;
 									margin: 20rpx 0 10rpx 0;
 								}
-								.book-author{
+
+								.book-author {
 									color: #999;
 									font-weight: 500;
 									font-size: 28rpx;
