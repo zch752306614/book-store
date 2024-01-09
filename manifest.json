@@ -68,12 +68,12 @@
     "h5" : {
         "devServer" : {
             "proxy" : {
-                "/dev-api" : {
+                "/novel" : {
                     "target" : "http://121.4.69.234:8001",
                     "changeOrigin" : true,
                     "secure" : false,
                     "pathRewrite" : {
-                        "^/dev-api" : ""
+                        "^/novel" : ""
                     }
                 }
             },
