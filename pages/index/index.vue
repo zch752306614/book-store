@@ -1,7 +1,7 @@
 <template>
     <view class="page-index" :style="paddingTop">
         <view class="index-top">
-            <text class="top-setting">设置</text>
+            <!-- <text class="top-setting">设置</text> -->
             <view class="top-main">
                 <view class="main-left">
                     <text class="main-hello">您好！愿轻松享受每一片段~</text>
@@ -14,9 +14,9 @@
             <view class="bookshelf-top">
                 <view class="top-left">
                     <text class="top-title">书架</text>
-                    <u-badge numberType="overflow" shape="horn" bgColor="#000" max="99" :value="1"></u-badge>
+                    <u-badge numberType="overflow" shape="horn" bgColor="#000" max="99" :value="list.length"></u-badge>
                 </view>
-                <text class="top-more">查看更多</text>
+                <text class="top-more" @click="toMore">查看更多</text>
             </view>
             <view class="bookshelf-list">
                 <view v-for="(item, index) in list" :key="index" class="list-one" @click="toBookread(item)">
@@ -34,9 +34,9 @@
                 <view class="read-top">
                     <view class="top-left">
                         <text class="top-title">已阅</text>
-                        <u-badge numberType="overflow" shape="horn" bgColor="#000" max="99" :value="1"></u-badge>
+                        <u-badge numberType="overflow" shape="horn" bgColor="#000" max="99" :value="list.length"></u-badge>
                     </view>
-                    <text class="top-more">查看更多</text>
+                    <text class="top-more" @click="toMore">查看更多</text>
                 </view>
                 <view class="read-list">
                     <view v-for="(item, index) in list" :key="index" class="list-one" @click="toBookread(item)">
@@ -70,7 +70,7 @@
                 paddingTop: '',
                 pageObj: {
                     page: 1,
-                    size: 100
+                    size: 6
                 },
                 list: []
             }
@@ -84,6 +84,11 @@
                 this.$Api.default.getBookList(this.pageObj, false, false).then(res => {
                     this.list = res.data.rows || []
                 })
+            },
+            toMore() {
+                uni.navigateTo({
+                    url: '/pages/list/index',
+                });
             },
             toBookread (item) {
                 uni.navigateTo({
@@ -278,9 +283,9 @@
                         .read-one-introduce {
                             width: 100%;
                             height: 200rpx;
-                            color: #333;
+                            color: #888;
                             font-weight: 500;
-                            font-size: 30rpx;
+                            font-size: 24rpx;
                             line-height: 50rpx;
                         }
 
@@ -324,14 +329,14 @@
 
                                 .book-name-right {
                                     color: #333;
-                                    font-weight: 500;
+                                    font-weight: 600;
                                     font-size: 30rpx;
                                     margin-top: 14rpx;
                                 }
 
                                 .book-author {
-                                    color: #999;
-                                    font-weight: 500;
+                                    color: #888;
+                                    font-weight: 400;
                                     font-size: 28rpx;
                                 }
                             }

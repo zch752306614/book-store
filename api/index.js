@@ -11,5 +11,9 @@ export default {
     // 根据id获取小说章节
     getBookById(params, nohide, noloading) {
         return API.GET(`/api/novelManage/queryChapterListById`, params, nohide, noloading)
+    },
+    // 根据chapterNumber获取小说章节
+    getBookByChapterNumber(params, nohide, noloading) {
+        return API.GET(`/api/novelManage/queryChapterListByConditions`, params, nohide, noloading)
     }
 }
