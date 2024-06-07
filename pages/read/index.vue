@@ -2,7 +2,7 @@
   <view class="page-read" :style="paddingTop">
     <scroll-view scroll-y="true" class="content-average" :scroll-into-view="scrollIntoView" @scroll="scroll" @click="showCatalogue">
       <view v-for="item in activeContentList" :key="item.id">
-        <view :id="childItem.id" v-for="(childItem, childIndex) in item.contentList" :key="childIndex">
+        <view class="content-text" :id="childItem.id" v-for="(childItem, childIndex) in item.contentList" :key="childIndex">
           <rich-text :nodes="childItem.content" />
         </view>
       </view>
@@ -22,7 +22,7 @@
 export default {
   data () {
     return {
-      adjacentNumber: 1, // 预获取相邻多少章
+      adjacentNumber: 10, // 预获取相邻多少章
       paddingTop: '',
       pageObj: {
         page: 1,
@@ -37,7 +37,6 @@ export default {
       scrollIntoView: "", // 滚动位置的id
       canClose: false,
       activeContentList: [], // 相邻的章节数组
-      activeLocalContentList: [], //全部的章节数组
       titleScrollTop: 0, // 标题滚动
       titleAllHeight: 0, // 全部标题可视高度
       novelInfoId: "", // 当前小说ID
@@ -50,7 +49,12 @@ export default {
     this.paddingTop = `pwadding-top:${this.StatusBar * 2 + 14}rpx;`;
     this.novelInfoId = e.novelInfoId
     this.getBookChapter(e)
-    this.getBookContent(e)
+    try {
+      const data = uni.getStorageSync(e.novelInfoId.toString());
+      if (!data) {
+        this.getBookContent(e)
+      }
+    } catch (e) { }
   },
   watch: {
     nowChapter (val) {
@@ -77,7 +81,7 @@ export default {
           res.data.rows.forEach(item => {
             let newList = []
             let splitList = []
-            if(item.chapterContent) {
+            if (item.chapterContent) {
               splitList = item.chapterContent.split('<p>')
             }
             if (splitList.length > 0) {
@@ -101,13 +105,12 @@ export default {
               contentList: newList
             })
           })
-          const newList = [...this.activeContentList, ...contentList]
+          const newContentList = [...this.activeContentList, ...contentList]
           const map = new Map()
-          const result = newList.filter(item => !map.has(item.chapterNumber) && map.set(item.chapterNumber, 1))
+          const result = newContentList.filter(item => !map.has(item.chapterNumber) && map.set(item.chapterNumber, 1))
           this.activeContentList = result.sort((a, b) => {
             return a.chapterNumber - b.chapterNumber
           })
-          this.activeLocalContentList = [...this.activeLocalContentList, ...contentList]
         }
       })
     },
@@ -116,7 +119,6 @@ export default {
       const adjacentNumbers = this.getAdjacentNumbers(chapterNumber, this.adjacentNumber)
       let existenceList = []
       let getChapterList = []
-      let getLocalChapterList = []
       if (this.activeContentList && this.activeContentList.length > 0 && adjacentNumbers.length > 0) {
         this.activeContentList.forEach(item => {
           adjacentNumbers.forEach(numberItem => {
@@ -127,9 +129,8 @@ export default {
         })
       }
       getChapterList = adjacentNumbers.filter(item => existenceList.indexOf(item) === -1)
-      getLocalChapterList = adjacentNumbers.filter(item => existenceList.includes(item))
       if (getChapterList.length > 0) {
-        await this.getAroundChapter(getChapterList, getLocalChapterList)
+        await this.getAroundChapter(getChapterList)
       }
     },
     // 获取相邻数字
@@ -148,9 +149,10 @@ export default {
       return adjacentNumbers
     },
     // 获取前后的章节
-    async getAroundChapter (list, localList) {
+    async getAroundChapter (list) {
       await this.$Api.default.getBookByChapterNumber({
         novelInfoId: this.novelInfoId,
+        contentFlag: '1',
         chapterNumberList: list.join(',')
       }, false, true).then(res => {
         let contentList = []
@@ -158,7 +160,7 @@ export default {
           res.data.forEach(item => {
             let newList = []
             let splitList = []
-            if(item.chapterContent) {
+            if (item.chapterContent) {
               splitList = item.chapterContent.split('<p>')
             }
             if (splitList.length > 0) {
@@ -182,18 +184,12 @@ export default {
               contentList: newList
             })
           })
-          let localData = []
-          if (localList.length > 0) {
-            localData = this.activeLocalContentList.filter(item => localList.includes(item.chapterNumber))
-          }
-          const newList = [...localData, ...contentList]
+          const newContentList = [...this.activeContentList, ...contentList]
           const map = new Map()
-          const result = newList.filter(item => !map.has(item.chapterNumber) && map.set(item
-            .chapterNumber, 1))
+          const result = newContentList.filter(item => !map.has(item.chapterNumber) && map.set(item.chapterNumber, 1))
           this.activeContentList = result.sort((a, b) => {
             return a.chapterNumber - b.chapterNumber
           })
-          this.activeLocalContentList = [...this.activeLocalContentList, ...contentList]
         }
       })
     },
@@ -274,14 +270,14 @@ export default {
       const query = uni.createSelectorQuery().in(that);
       query.selectAll('.chapterContent').boundingClientRect(res => {
         if (res && res.length > 0) {
-          let smallDistance = 0
+          let smallDistance = null
           let nowIndex = 0
           res.forEach((item, index) => {
             if (item.top < 60) {
-              if (!smallDistance) {
+              if (smallDistance === null) {
                 smallDistance = item.top
               } else {
-                if (smallDistance < item.top) {
+                if (smallDistance < item.top && item.top <= 0) {
                   smallDistance = item.top
                   nowIndex = index
                 }
@@ -337,8 +333,8 @@ page {
       letter-spacing: 6rpx;
     }
 
-    p + p {
-      margin-top: 30rpx;
+    .content-text + .content-text {
+      margin-bottom: 30rpx;
     }
   }
 
