@@ -55,6 +55,18 @@ export default {
         this.getBookContent(e)
       }
     } catch (e) { }
+    let idNeedList = []
+    try {
+      const idList = uni.getStorageSync("idList")
+      if (idList) {
+        idNeedList = JSON.parse(idList)
+      }
+    } catch (e) { }
+    if(idNeedList.indexOf(e.novelInfoId) !== -1){
+      idNeedList.splice(idNeedList.indexOf(e.novelInfoId),1)
+    }
+    idNeedList.unshift(e.novelInfoId)
+    uni.setStorageSync("idList", JSON.stringify(idNeedList))
   },
   watch: {
     nowChapter (val) {

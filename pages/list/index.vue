@@ -6,7 +6,20 @@
           <text class="top-title">精选好书</text>
         </view>
       </view>
-      <u-search v-model="novelName" :showAction="true" bgColor="#fff" actionText="搜索" :animation="true" @search="hanlerSearch" @custom="hanlerSearch" />
+      <u-search v-model="searchName" :showAction="true" bgColor="#fff" actionText="搜索" placeholder="书名/作者名" :animation="true" @search="hanlerSearch"
+        @custom="hanlerSearch" />
+      <view v-if="historyList.length > 0" class="history-content">
+        <view class="history-content-top">
+          <view class="history-content-top-left">
+            <u-icon name="clock" color="#666" size="28rpx" />
+            <text class="top-title">历史搜索</text>
+          </view>
+          <u-icon name="trash" color="#666" size="34rpx" @click="clearHistory" />
+        </view>
+        <view class="history-main">
+          <view class="history-text" v-for="(item,index) in historyList" :key="index" @click="getHistoryToSearch(item)">{{ item }}</view>
+        </view>
+      </view>
       <scroll-view scroll-y class="book-list-content" refresher-background="#eee" @scrolltolower="getBookList">
         <view v-for="(item, index) in list" :key="index" class="list-one" @click="toBookread(item)">
           <view class="read-one-main">
@@ -36,28 +49,64 @@ export default {
     return {
       dayjs: dayjs,
       paddingTop: '',
+      historyList: [],
       pageObj: {
         page: 1,
         size: 10
       },
-      novelName: "",
+      searchName: "",
       list: []
     }
   },
-  onLoad () {
+  onLoad (e) {
     this.paddingTop = `padding-top:${this.StatusBar * 2 + 14}rpx;`;
-    this.getBookList('new')
+    if(e.recode){
+      this.getBookList('new','recode')
+    }else{
+      this.getBookList('new')
+    }
+    try {
+      const historyList = uni.getStorageSync("historyList")
+      if (historyList) {
+        this.historyList = JSON.parse(historyList)
+      }
+    } catch (e) { }
   },
   methods: {
-    hanlerSearch () {
+    clearHistory() {
+      this.historyList = []
+      uni.setStorageSync("historyList", JSON.stringify([]))
+    },
+    getHistoryToSearch(searchName) {
+      this.searchName = searchName
       this.pageObj.page = 1
       this.getBookList('new')
     },
-    getBookList (isNew) {
+    hanlerSearch () {
+      this.pageObj.page = 1
+      this.getBookList('new')
+      const historyList = [...this.historyList]
+      historyList.unshift(this.searchName)
+      if (historyList && historyList.length === 6) {
+        historyList.pop()
+      }
+      uni.setStorageSync("historyList", JSON.stringify(historyList))
+      this.historyList = [...historyList]
+    },
+    getBookList (isNew, isRecode) {
       if (isNew !== 'new') {
         this.pageObj.page = this.pageObj.page + 1
       }
-      this.$Api.default.getBookList({ novelName: this.novelName, ...this.pageObj }, false, false).then(res => {
+      let idList = []
+      if(isRecode) {
+        try {
+          idList = uni.getStorageSync("idList")
+        if (idList) {
+          idList = JSON.parse(idList)
+        }
+      } catch (e) { }
+      }
+      this.$Api.default.getBookList({ searchName: this.searchName, ...this.pageObj, idList }, false, false).then(res => {
         if (isNew === 'new') {
           this.list = res.data.rows || []
         } else {
@@ -268,6 +317,53 @@ page {
             }
           }
         }
+      }
+    }
+  }
+
+  .history-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    padding: 12rpx 16rpx;
+    border-radius: 18rpx;
+    box-sizing: border-box;
+    margin-top: 20rpx;
+
+    .history-content-top {
+      width: 100%;
+      display: flex;
+      align-content: center;
+      justify-content: space-between;
+
+      .history-content-top-left {
+        width: 100%;
+        display: flex;
+        align-content: center;
+
+        .top-title {
+          color: #333;
+          font-size: 28rpx;
+          margin-left: 20rpx;
+        }
+      }
+    }
+    .history-main {
+      width: 100%;
+      display: flex;
+      align-content: center;
+      flex-wrap: wrap;
+      margin-top: 12rpx;
+
+      .history-text {
+        color: #888;
+        font-size: 24rpx;
+        padding: 6rpx 12rpx;
+        background-color: #f0f0f0;
+        margin-left: 10rpx;
+        margin-top: 10rpx;
+        border-radius: 20rpx;
       }
     }
   }
